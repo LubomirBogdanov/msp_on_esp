@@ -1,0 +1,106 @@
+/*
+ * wub common
+ *
+ *  Created on: June 04, 2019
+ *      Author: lbogdanov
+ *
+ *      file version 1.0
+ */
+
+#ifndef WUB_COMMON_H_
+#define WUB_COMMON_H_
+
+//Parameters
+#define CMD_PARAM_ON_STR				"ON"
+#define CMD_PARAM_OFF_STR				"OFF"
+#define CMD_PARAM_SHARED_STR			"SHARED"
+#define CMD_PARAM_DEDICATED_STR 		"DEDIC"
+#define CMD_PARAM_ODD_STR				"ODD"
+#define CMD_PARAM_EVEN_STR				"EVEN"
+#define CMD_PARAM_DISABLED_STR			"DISABLED"
+#define CMD_PARAM_ONE_STR				"ONE"
+#define CMD_PARAM_ONE_AND_HALF_STR		"ONE_AND_HALF"
+#define CMD_PARAM_TWO_STR				"TWO"
+#define CMD_EXEC_DONE_STR				"DONE\n\r" //Reply from server that the requested cmd has been executed
+#define CMD_NONE_STR					"NONE, try HELP\n\r"
+//Wifi commands
+#define CMD_TRANSPARENT_STR				"TRAN" //TRAN {ON}
+#define CMD_SET_BSL_TYPE_STR			"BSLT" //BSLT {SHARED|DEDICATED}
+#define CMD_ENTER_BSL_STR				"BOOT" //BOOT
+#define CMD_SET_TRANSPARENT_TIMEOUT_STR	"SETT" //SETT <numeric value>
+#define CMD_HELP_STR					"HELP" //HELP
+#define CMD_HALT_STR					"HALT" //HALT
+#define CMD_HELLO_STR					"HELLo" //HELLo
+#define CMD_RSTT_STR					"RSTT" //RSTT
+#define CMD_SET_UART_BAUDRATE_STR		"SETB" //SETB <numeric value>
+#define CMD_SET_UART_WORD_STR			"SETW" //SETW <numeric value>
+#define CMD_SET_UART_PARITY_STR			"SETP" //SETP {ODD|EVEN|DISABLED}
+#define CMD_SET_UART_STOP_STR			"SETS" //SETS {ONE|ONE_AND_HALF|TWO}
+#define CMD_UART_APPLY_CONFIG_STR		"UARA" //UARA
+#define CMD_RESTART_WUB_STR				"WUBR" //WUBR
+#define CMD_WIFI_SET_SSID_STR			"SSID" //SSID <ip value>
+#define CMD_WIFI_SET_PASS_STR			"PASS" //PASS <string>
+#define CMD_WIFI_SET_PORT_STR			"PORT" //PORT <numeric value>
+#define CMD_WIFI_START_STR				"WIFS" //WIFS
+//UART commands
+#define CMD_UART_SET_SSID_STR			"SSID" //SSID <ip value>
+#define CMD_UART_SET_PASS_STR			"PASS" //PASS <string>
+#define CMD_UART_SET_PORT_STR			"PORT" //PORT <numeric value>
+#define CMD_UART_WIFI_START_STR			"WIFS" //WIFS
+
+#define HELP_STR	"TRAN {ON} - Set transparent mode ON.\n\r"														\
+					"BSLT {SHARED|DEDICATED} - select BSL entry sequence type - shared or dedicated.\n\r"			\
+		    		"BOOT - initiate MSP430 boot sequence.\n\r"														\
+					"RSTT - reset target. SBWTDIO (RST) must be tied to Vdd with pull-up.\n\r"						\
+		    		"SETT <numeric value> - set timeout for the transparent mode. (not implemented yet)\n\r"	    \
+		    		"HELP - display this help over wifi.\n\r"														\
+					"HALT - hold the target in reset.\n\r"															\
+					"SETB <numeric value> - set uart baudrate, see ESP8266 datasheet for valid values.\n\r"			\
+					"SETW <numeric value> - set uart word length, valid values are 5, 6, 7 and 8.\n\r"				\
+					"SETP {ODD|EVEN|NONE} - set uart parity, valid values are the strings ODD, EVEN or NONE.\n\r"	\
+					"SETS {ONE|ONE_AND_HALF|TWO} - set uart stop bit.\n\r"											\
+					"UARA - UART apply config with the new settings.\n\r"											\
+					"WUBR - restart wifi-uart-bridge without restarting the target.\n\r"  							\
+					"HELLo - display a warm greeting over TCP/IP to test connection.\n\r"							\
+					"SSID <string> - change the SSID name over the current network.\n\r"							\
+					"PASS <string> - change the network passord over the current network.\n\r"						\
+					"PORT <numeric value> - change the listen port over the current network.\n\r"					\
+					"WIFS - start a new server using the above parameters over the current network.\n\r"			\
+					"-------Uart commands:--------\n\r"																\
+					"SSID <string> - change the SSID name over UART.\n\r"											\
+					"PASS <string> - change the network passord over UART.\n\r"										\
+					"PORT <numeric value> - change the listen port over UART.\n\r"									\
+					"WIFS - start a new server using the above parameters over UART.\n\r"							\
+					"-------Reply--------\n\r"																		\
+					"DONE - the requested command has been executed. Some commands do not have a reply.\n\r"		\
+					"NONE - the requested command does not exist or an error has occured.\n\r"						\
+
+typedef enum{
+	BSL_UART_SHARED_JTAG_SBW,
+	BSL_UART_DEDICATED_JTAG
+}bsl_type_e;
+
+typedef enum{
+	CMD_TRANSPARENT_ON,
+	CMD_SET_BSL_SHARED,
+	CMD_SET_BSL_DEDICATED,
+	CMD_ENTER_BSL,
+	CMD_SET_TIMEOUT,
+	CMD_HELP,
+	CMD_HELLO,
+	CMD_RSTT,
+	CMD_HALT,
+	CMD_SET_UART_BAUDRATE,
+	CMD_SET_UART_WORD_LEN,
+	CMD_SET_UART_PARITY,
+	CMD_SET_UART_STOP_BIT,
+	CMD_UART_APPLY_CONFIG,
+	CMD_RESTART_WUB,
+	CMD_SET_SSID,
+	CMD_SET_SSID_PASS,
+	CMD_SET_SOCK_PORT,
+	CMD_START_WIFI,
+	CMD_NONE
+}wub_cmd_e;
+
+#endif
