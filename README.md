@@ -56,9 +56,9 @@ make
 sudo make install  
 
 //Wifi-to-UART-Bridge (WUB)  
-Make sure you're running a FLASH or ROM-based BSL on your MSP430  
-device. Make the following connections (example given for MSP430  
-F5529):  
+Make sure you're running a FLASH or ROM-based UART BSL on your  
+MSP430 device. Make the following connections (example given for   
+MSP430F5529):  
 <pre>  
                                     o 3V3      
                                     |                                                                                
