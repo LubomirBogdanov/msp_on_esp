@@ -58,7 +58,8 @@ sudo make install
 //Wifi-to-UART-Bridge (WUB)  
 Make sure you're running a FLASH or ROM-based BSL on your MSP430  
 device. Make the following connections (example given for MSP430  
-F5529:  
+F5529):  
+<pre>  
                                     o 3V3      
                                     |                                                                                
                                     | _ _GND  
@@ -76,6 +77,7 @@ ESP8266 module                      >  |  MSP430F5529
                |                          |
                |                          |
 ----------------                          ----------------
+</pre>  
 
 Note: omit resistors if the respective MSP430 pins are not used in  
 the application circuit and if those pins are dedicated to firmware  
