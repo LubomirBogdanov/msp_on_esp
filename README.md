@@ -29,6 +29,10 @@ the WUB can be used for printf debugging over the Internet. Check
 the SCPI commands below. For a tcp-ip client you can use telnet,  
 netcat, putty, tera term and so on.  
 
+
+!!! NOTE: the default UART settings are 9600-8-E-1 !!!  
+
+
 INSTALL  
 ===================================================================
 //MSPDebug  

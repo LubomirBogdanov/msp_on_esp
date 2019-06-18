@@ -91,6 +91,7 @@ struct device_args {
 	uint8_t                 bsl_entry_password[32];
 	uint16_t socket_port;
 	char socket_ip[16];
+	char sbw_type[16];
 };
 
 struct device_class {

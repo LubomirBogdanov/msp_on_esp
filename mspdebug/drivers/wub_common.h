@@ -21,8 +21,14 @@
 #define CMD_PARAM_ONE_STR				"ONE"
 #define CMD_PARAM_ONE_AND_HALF_STR		"ONE_AND_HALF"
 #define CMD_PARAM_TWO_STR				"TWO"
+//Replies
 #define CMD_EXEC_DONE_STR				"DONE\n\r" //Reply from server that the requested cmd has been executed
 #define CMD_NONE_STR					"NONE, try HELP\n\r"
+#define CMD_CONNECTED_STR				"CONN\n\r"
+#define CMD_WIFI_DISCONNECTED_STR		"DISC\n\r"
+#define CMD_WIFI_UNKNOWN_ERROR_STR		"WERR\n\r"
+#define CMD_UART_UNKNOWN_ERROR_STR		"UERR\n\r"
+#define CMD_UART_UNKNOWN_COMMAND_STR	"ERRU\n\r"
 //Wifi commands
 #define CMD_TRANSPARENT_STR				"TRAN" //TRAN {ON}
 #define CMD_SET_BSL_TYPE_STR			"BSLT" //BSLT {SHARED|DEDICATED}
@@ -47,6 +53,10 @@
 #define CMD_UART_SET_PASS_STR			"PASS" //PASS <string>
 #define CMD_UART_SET_PORT_STR			"PORT" //PORT <numeric value>
 #define CMD_UART_WIFI_START_STR			"WIFS" //WIFS
+#define CMD_UART_WIFI_STOP_STR			"WIFT" //WIFT
+#define CMD_UART_HELP_STR				"HELP" //HELP
+#define CMD_UART_SET_TRAN_STR			"TRPI" //TRPI (transparent pin)
+#define CMD_UART_SET_TRAN_OFF_STR		"TRPO" //TRPO (transparent pin off)
 
 #define HELP_STR	"TRAN {ON} - Set transparent mode ON.\n\r"														\
 					"BSLT {SHARED|DEDICATED} - select BSL entry sequence type - shared or dedicated.\n\r"			\
@@ -71,9 +81,18 @@
 					"PASS <string> - change the network passord over UART.\n\r"										\
 					"PORT <numeric value> - change the listen port over UART.\n\r"									\
 					"WIFS - start a new server using the above parameters over UART.\n\r"							\
+					"WIFT - stop the server and disconnect from wi-fi, this is UART command only.\n\r"				\
+					"TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.\n\r"	\
+					"TRPO - deinit pin transparency, use TRAN command only.\n\r"	                                \
+					"HELP - display this help over UART.\n\r"														\
 					"-------Reply--------\n\r"																		\
 					"DONE - the requested command has been executed. Some commands do not have a reply.\n\r"		\
 					"NONE - the requested command does not exist or an error has occured.\n\r"						\
+					"CONN - the wub has connected successfully to the wi-fi network.\n\r"							\
+					"DISC - the wub has been disconnected from the wi-fi network.\n\r"	     						\
+					"WERR - An unknown error has occured with the wi-fi adapter.\n\r"								\
+					"UERR - An unknown error has occured on the UART interface.\n\r"								\
+					"ERRU - An unknown command has been requested on the UART interface.\n\r"						\
 
 typedef enum{
 	BSL_UART_SHARED_JTAG_SBW,

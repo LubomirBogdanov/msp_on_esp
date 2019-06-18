@@ -11,6 +11,7 @@
 extern TaskHandle_t wub_cmd_task_h;
 extern TaskHandle_t wub_uart_cmd_task_h;
 extern TaskHandle_t wub_server_task_h;
+extern TaskHandle_t wub_gpio_transparent_task_h;
 extern EventGroupHandle_t wifi_event_group;
 
 void app_main(){
@@ -29,12 +30,16 @@ void app_main(){
 		ret = nvs_flash_init();
 	}
 
+	gpio_install_isr_service(0);
 	pin_init_as_inputs();
 	uart_init(&uart_default_config);
 	wifi_init_defaults();
 	init_defaults_params();
 
+	wub_uart_cmd_task_h = NULL;
+	wub_cmd_task_h = NULL;
 	wub_server_task_h = NULL;
+	wub_gpio_transparent_task_h = NULL;
 
 	wifi_event_group = xEventGroupCreate();
 

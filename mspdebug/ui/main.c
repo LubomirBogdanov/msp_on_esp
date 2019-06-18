@@ -307,7 +307,8 @@ static int parse_cmdline_args(int argc, char **argv,
 		LOPT_BSL_ENTRY_PASSWORD,
 		LOPT_WIFI_BRIDGE_SKIP_INIT,
 		LOPT_SOCKET_PORT,
-		LOPT_SOCKET_IP
+		LOPT_SOCKET_IP,
+		LOPT_SBW_PINS_TYPE
 	};
 
 	static const struct option longopts[] = {
@@ -329,6 +330,7 @@ static int parse_cmdline_args(int argc, char **argv,
 		{"wifi-bridge-skip-init",  0, 0, LOPT_WIFI_BRIDGE_SKIP_INIT},
 		{"wub-port",  1, 0, LOPT_SOCKET_PORT},
 		{"wub-ip",  1, 0, LOPT_SOCKET_IP},
+		{"sbw-type",  1, 0, LOPT_SBW_PINS_TYPE},
 		{NULL, 0, 0, 0}
 	};
 
@@ -459,6 +461,10 @@ static int parse_cmdline_args(int argc, char **argv,
 
 		case LOPT_SOCKET_IP:
 			strcpy(args->devarg.socket_ip, optarg);
+			break;
+
+		case LOPT_SBW_PINS_TYPE:
+			strcpy(args->devarg.sbw_type, optarg);
 			break;
 
 		case '?':

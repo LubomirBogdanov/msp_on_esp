@@ -21,6 +21,7 @@
 #include "unistd.h"
 #include "driver/uart.h"
 #include "wub_common.h"
+#include "esp_sleep.h"
 
 //#define WUB_DEBUG
 #define GPIO_PIN_0						0x01
@@ -42,6 +43,8 @@
 #define WUB_CMD_TASK_PRIORITY			5
 #define WUB_UART_CMD_TASK_PRIORITY		5
 #define WUB_MAIN_TASK_PRIORITY			5
+#define WUB_GPIO_TRANSPARENT_PRIORITY	5
+#define WUB_GPIO_TRANSPARENT_DEBOUNCE	10
 #define WUB_DEFAULT_TRANSP_TIMEOUT		1000
 #define WUB_DEFAULT_UART_BAUD			CONFIG_CONSOLE_UART_BAUDRATE
 #define WUB_DEFAULT_UART_PARITY			UART_PARITY_EVEN
@@ -67,9 +70,12 @@ typedef struct{
 	uint32_t transparent_timeout;
 	wifi_config_t wifi_config;
 	uint16_t tcp_listen_port;
+	uint8_t wifi_connected;
+	uint8_t gpio_transparent;
 }wub_config_t;
 
 void wifi_init_sta(void);
+void wifi_deinit_sta(void);
 void enter_boot(void);
 void reset_target(void);
 void halt_target(void);
@@ -77,8 +83,12 @@ void pin_init_as_inputs(void);
 void pin_init_as_outputs(void);
 void pin_rst_set(uint8_t value);
 void pin_boot_set(uint8_t value);
+void pin_init_transparent(uint8_t pin_number);
+void pin_deinit_transparent(void);
 void uart_init(uart_config_t *uart_config);
 void uart_apply_config(void);
+void display_help(void);
+void display_help_uart(void);
 
 wub_cmd_e wifi_cmd_parse(uint32_t *param_numeric);
 void flush_wifi_cmd_buff(void);
@@ -93,5 +103,6 @@ void wub_uart_rx_event_task(void *pvParameters);
 void wub_uart_cmd_exec_task(void *pvParameters);
 void wub_wifi_cmd_exec_task(void *pvParameters);
 void wub_wifi_server_task(void *pvParameters);
+void wub_gpio_transparent_task(void *arg);
 
 #endif /* WIFI_UART_BRIDGE_H_ */

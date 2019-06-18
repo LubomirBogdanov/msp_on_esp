@@ -9,6 +9,7 @@
 TaskHandle_t wub_cmd_task_h;
 TaskHandle_t wub_uart_cmd_task_h;
 TaskHandle_t wub_server_task_h;
+TaskHandle_t wub_gpio_transparent_task_h;
 EventGroupHandle_t wifi_event_group;
 const int ipv4_gotip_bit = BIT0;
 QueueHandle_t uart0_queue;
@@ -18,27 +19,40 @@ int client_socket;
 int server_socket;
 
 static esp_err_t event_handler(void *ctx, system_event_t *event){
+	char ip_buff[32];
+
 	switch(event->event_id) {
 	case SYSTEM_EVENT_STA_START:
 		esp_wifi_connect();
 		DEBUGOUT("SYSTEM_EVENT_STA_START\n");
 		break;
 	case SYSTEM_EVENT_STA_GOT_IP:
+		sprintf(ip_buff, "IP: %s\n\r", ip4addr_ntoa(&event->event_info.got_ip.ip_info.ip));
+		uart_write_bytes(UART_NUM_0, (const char *) ip_buff, strlen((const char *) ip_buff));
+		sprintf(ip_buff, "PORT: %04d\n\r", wub_conf.tcp_listen_port);
+		uart_write_bytes(UART_NUM_0, (const char *) ip_buff, strlen((const char *) ip_buff));
+		wub_conf.wifi_connected = 1;
 		xEventGroupSetBits(wifi_event_group, ipv4_gotip_bit);
 		DEBUGOUT("SYSTEM_EVENT_STA_GOT_IP\n");
 		break;
 	case SYSTEM_EVENT_STA_DISCONNECTED:
+		if(wub_conf.wifi_connected){
+			uart_write_bytes(UART_NUM_0, (const char *) CMD_WIFI_DISCONNECTED_STR, strlen((const char *) CMD_WIFI_DISCONNECTED_STR));
+			wub_conf.wifi_connected = 0;
+		}
 		esp_wifi_connect();
 		xEventGroupClearBits(wifi_event_group, ipv4_gotip_bit);
 		DEBUGOUT("SYSTEM_EVENT_STA_DISCONNECTED\n");
 		break;
 	case SYSTEM_EVENT_STA_CONNECTED:
+		uart_write_bytes(UART_NUM_0, (const char *) CMD_CONNECTED_STR, strlen((const char *) CMD_CONNECTED_STR));
 		DEBUGOUT("SYSTEM_EVENT_STA_CONNECTED\n");
 		break;
 	case SYSTEM_EVENT_STA_STOP:
 		DEBUGOUT("SYSTEM_EVENT_STA_STOP\n");
 		break;
 	default:
+		uart_write_bytes(UART_NUM_0, (const char *) CMD_WIFI_UNKNOWN_ERROR_STR, strlen((const char *) CMD_WIFI_UNKNOWN_ERROR_STR));
 		DEBUGOUT("UNHANDLED_EVENT (%d)\n", event->event_id);
 		break;
 	}
@@ -49,25 +63,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event){
 void wifi_init_sta(void){
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 
-	if(wub_server_task_h){
-		vTaskDelete(wub_server_task_h);
-	}
-
-	if(server_socket){
-		shutdown(server_socket, 0);
-		close(server_socket);
-		server_socket = 0;
-	}
-
-	if(client_socket){
-		shutdown(client_socket, 0);
-		close(client_socket);
-		wub_conf.transparent_mode = 0;
-	}
-
-	esp_wifi_stop();
-
-	vTaskDelay(100);
+	wifi_deinit_sta();
 
 	tcpip_adapter_init();
 	esp_event_loop_init(event_handler, NULL);
@@ -81,6 +77,41 @@ void wifi_init_sta(void){
 	DEBUGOUT("Trying to connect\n\r");
 	DEBUGOUT("ssid: %s\n\r", wub_conf.wifi_config.sta.ssid);
 	DEBUGOUT("pass: %s\n\r", wub_conf.wifi_config.sta.password);
+}
+
+void wifi_deinit_sta(void){
+	if(client_socket){
+		shutdown(client_socket, 0);
+		close(client_socket);
+		wub_conf.transparent_mode = 0;
+		client_socket = 0;
+	}
+
+	if(server_socket){
+		shutdown(server_socket, 0);
+		close(server_socket);
+		server_socket = 0;
+	}
+
+	if(wub_server_task_h){
+		vTaskDelete(wub_server_task_h);
+		wub_server_task_h = NULL;
+	}
+
+	esp_wifi_stop();
+
+	//Nothing here works to turn off radio
+	//Good luck!
+	//esp_wifi_set_mode(WIFI_MODE_NULL);
+	//esp_wifi_deinit();
+	//wifi_fpm_set_sleep_type(WIFI_MODEM_SLEEP_T);
+	//wifi_fpm_open();
+	//wifi_fpm_do_sleep(0xfffffff);
+	//tcpip_adapter_stop(TCPIP_ADAPTER_IF_STA);
+	//esp_wifi_disconnect();
+	//wifi_power_save();
+
+	vTaskDelay(100);
 }
 
 void flush_wifi_cmd_buff(void){
@@ -115,6 +146,10 @@ int16_t find_terminator_index(char *str){
 
 void display_help(void){
 	send(client_socket, (const char *)HELP_STR, strlen(HELP_STR), 0);
+}
+
+void display_help_uart(void){
+	uart_write_bytes(UART_NUM_0, (const char *)HELP_STR, strlen((const char *) HELP_STR));
 }
 
 void pin_init_as_inputs(void){
@@ -246,6 +281,7 @@ void init_defaults_params(void){
 	wub_conf.transparent_mode = 0;
 	wub_conf.boot_mode = BSL_UART_SHARED_JTAG_SBW;
 	wub_conf.transparent_timeout = WUB_DEFAULT_TRANSP_TIMEOUT;
+	wub_conf.wifi_connected = 0;
 }
 
 void wifi_init_defaults(void){
@@ -424,6 +460,63 @@ err:
 	return cmd_converted;
 }
 
+void pin_init_transparent(uint8_t pin_number){
+	gpio_config_t io_conf;
+	io_conf.intr_type = GPIO_INTR_NEGEDGE;
+    io_conf.pin_bit_mask = (1 << pin_number);
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = 1;
+    io_conf.pull_down_en = 0;
+    gpio_config(&io_conf);
+
+    if(wub_gpio_transparent_task_h){
+    	vTaskDelete(wub_gpio_transparent_task_h);
+    	wub_gpio_transparent_task_h = NULL;
+    }
+
+    xTaskCreate(wub_gpio_transparent_task, "wub_gpio_transparent_task", 2048, NULL, WUB_GPIO_TRANSPARENT_PRIORITY, &wub_gpio_transparent_task_h);
+
+    DEBUGOUT("pin_init_transparent %d\n\r", pin_number);
+}
+
+void pin_deinit_transparent(void){
+    if(wub_gpio_transparent_task_h){
+    	vTaskDelete(wub_gpio_transparent_task_h);
+    	wub_gpio_transparent_task_h = NULL;
+    }
+}
+
+//Can't get interrupts to work, so
+//I'll use polling
+void wub_gpio_transparent_task(void *arg){
+    uint8_t pin_level_new = 0;
+    uint8_t pin_level_old = 0;
+
+    DEBUGOUT("wub_gpio_transparent_task\n\r");
+
+    while(1) {
+    	pin_level_new = gpio_get_level(wub_conf.gpio_transparent);
+    	if(pin_level_new != pin_level_old){
+    		pin_level_old = pin_level_new;
+
+    		if(pin_level_new){
+    			DEBUGOUT("1\n\r");
+    			wub_conf.transparent_mode = 1;
+    		}
+    		else{
+    			DEBUGOUT("0\n\r");
+    			wub_conf.transparent_mode = 0;
+    		}
+
+    		vTaskDelay(WUB_GPIO_TRANSPARENT_DEBOUNCE);
+    	}
+    	vTaskDelay(1);
+    }
+
+    wub_gpio_transparent_task_h = NULL;
+    vTaskDelete(NULL);
+}
+
 void wub_uart_rx_event_task(void *pvParameters){
 	uart_event_t event;
 	DEBUGOUT("wub_uart_event_task\n\r");
@@ -500,22 +593,46 @@ void wub_uart_cmd_exec_task(void *pvParameters){
 
 			if(!strcmp(cmd_buff, CMD_UART_SET_SSID_STR)){
 				strcpy((char *)wub_conf.wifi_config.sta.ssid, param_buff);
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
 				DEBUGOUT("wub: new ssid: %s\n\r", wub_conf.wifi_config.sta.ssid);
 			}
 			else if(!strcmp(cmd_buff, CMD_UART_SET_PASS_STR)){
 				strcpy((char *)wub_conf.wifi_config.sta.password, param_buff);
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
 				DEBUGOUT("wub: new pass: %s\n\r", wub_conf.wifi_config.sta.password);
 			}
 			else if(!strcmp(cmd_buff, CMD_UART_SET_PORT_STR)){
 				wub_conf.tcp_listen_port = atoi(param_buff);
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
 				DEBUGOUT("wub: new port: %d\n\r", wub_conf.tcp_listen_port);
 			}
 			else if(!strcmp(cmd_buff, CMD_UART_WIFI_START_STR)){
 				wifi_init_sta();
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_UART_WIFI_STOP_STR)){
+				wifi_deinit_sta();
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_UART_SET_TRAN_STR)){
+				wub_conf.gpio_transparent = atoi(param_buff);
+				pin_init_transparent(wub_conf.gpio_transparent);
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_UART_SET_TRAN_OFF_STR)){
+				pin_deinit_transparent();
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_UART_HELP_STR)){
+				display_help_uart();
+			}
+			else{
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_UART_UNKNOWN_COMMAND_STR, strlen((const char *) CMD_UART_UNKNOWN_COMMAND_STR));
 			}
 		}
 		else{
-			DEBUGOUT("wub error: command must end with newline or carriage return!\n\r");
+			uart_write_bytes(UART_NUM_0, (const char *) CMD_UART_UNKNOWN_ERROR_STR, strlen((const char *) CMD_UART_UNKNOWN_ERROR_STR));
+			DEBUGOUT("wub error: command must end with newline or carriage return! %s\n\r", wub_conf.uart_rx_buffer);
 		}
 
 		field_counter = 0;

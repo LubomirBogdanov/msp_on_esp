@@ -680,7 +680,12 @@ static device_t flash_bsl_wifi_bridge_open(const struct device_args *args)
 
 	if(args->flags != DEVICE_WIFI_BRIDGE_SKIP_INIT){
 		if(flash_bsl_wifi_bridge_connect(args)){
-			flash_bsl_wifi_bridge_gencmd(CMD_SET_BSL_TYPE_STR, CMD_PARAM_SHARED_STR, cmd_buff);
+			if(!strcmp(args->sbw_type, CMD_PARAM_SHARED_STR)){
+				flash_bsl_wifi_bridge_gencmd(CMD_SET_BSL_TYPE_STR, CMD_PARAM_SHARED_STR, cmd_buff);
+			}
+			else if(!strcmp(args->sbw_type, CMD_PARAM_DEDICATED_STR)){
+				flash_bsl_wifi_bridge_gencmd(CMD_SET_BSL_TYPE_STR, CMD_PARAM_DEDICATED_STR, cmd_buff);
+			}
 			printc_dbg("wub> %s ...", cmd_buff);
 			sockets_send(client_socket, cmd_buff, strlen(cmd_buff), 0);
 			sockets_recv(client_socket, recv_buff, 64, 0, WUB_CMD_TIMEOUT_MS, &was_timeout);
