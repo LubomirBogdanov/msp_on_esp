@@ -100,22 +100,23 @@ and search for the newly connected device. Find your WUB device
 ip address. By default the WUB uses port 5556.   
 
 //WUB flash example projects for MSP430F5529  
-./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --long-password 'prog msp_on_esp/example_hex/01_msp430f55xx_P1.0_heartbeat.txt'  
-./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --long-password 'prog msp_on_esp/example_hex/02_msp430f55xx_P1.0_blinky_slow.txt'  
-./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --long-password 'prog msp_on_esp/example_hex/03_msp430f55xx_P1.0_blinky_fast.txt'  
-./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --long-password 'prog msp_on_esp/example_hex/04_msp430f55xx_UCA1RX_P4.5_UCA1TX_P4.4_uart_echo.txt'  
-./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --long-password 'prog msp_on_esp/example_hex/05_msp430f55xx_picojpeg_13k_flash.txt'  
-./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --long-password 'prog msp_on_esp/example_hex/06_msp430f55xx_mean_val_64k.txt'  
-./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --long-password 'prog msp_on_esp/example_hex/07_msp430f55xx_mean_val_128k.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --sbw-type {SBW_TYPE} --long-password 'prog msp_on_esp/example_hex/01_msp430f55xx_P1.0_heartbeat.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --sbw-type {SBW_TYPE} --long-password 'prog msp_on_esp/example_hex/02_msp430f55xx_P1.0_blinky_slow.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --sbw-type {SBW_TYPE} --long-password 'prog msp_on_esp/example_hex/03_msp430f55xx_P1.0_blinky_fast.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --sbw-type {SBW_TYPE} --long-password 'prog msp_on_esp/example_hex/04_msp430f55xx_UCA1RX_P4.5_UCA1TX_P4.4_uart_echo.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --sbw-type {SBW_TYPE} --long-password 'prog msp_on_esp/example_hex/05_msp430f55xx_picojpeg_13k_flash.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --sbw-type {SBW_TYPE} --long-password 'prog msp_on_esp/example_hex/06_msp430f55xx_mean_val_64k.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip {wub-ip} --wub-port {wub-port} --sbw-type {SBW_TYPE} --long-password 'prog msp_on_esp/example_hex/07_msp430f55xx_mean_val_128k.txt'  
 
 //Reset  
-./mspdebug flash-bsl-wifi-bridge --wub-ip 10.42.0.49 --wub-port 5556 --wifi-bridge-skip-init 'reset'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip 10.42.0.49 --wub-port 5556 --sbw-type SHARED --wifi-bridge-skip-init 'reset'  
 
 On my computer I used:  
 
-./mspdebug flash-bsl-wifi-bridge --wub-ip 10.42.0.49 --wub-port 5556 --long-password 'prog /home/user/Desktop/msp_on_esp/example_hex/07_msp430f55xx_mean_val_128k.txt'  
+./mspdebug flash-bsl-wifi-bridge --wub-ip 10.42.0.49 --wub-port 5556 --sbw-type SHARED --long-password 'prog /home/user/Desktop/msp_on_esp/example_hex/07_msp430f55xx_mean_val_128k.txt'  
 
-because the wi-fi router gave the IP 10.41.0.49 to my board.  
+because the wi-fi router gave the IP 10.41.0.49 to my board. The --swb-type can be SHARED or DEDIC depending on the MSP430 device used. MSP430F5529 uses SHARED but I've  
+tested it with DEDIC and it works also.   
 
 Supported WUB SCPI commands  
 ===================================================================  
