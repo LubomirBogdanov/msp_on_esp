@@ -139,7 +139,7 @@ SSID <string> - change the SSID name over the current network.
 PASS <string> - change the network passord over the current network.  
 PORT <numeric value> - change the listen port over the current network.  
 WIFS - start a new server using the above parameters over the current network.  
-*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.  
+*IDN? - request WUB identification number: (manufac),(model),(serno),HW(1.0),SW(1.0).  
 -------Uart commands:--------  
 SSID <string> - change the SSID name over UART.  
 PASS <string> - change the network passord over UART.  
@@ -148,8 +148,9 @@ WIFS - start a new server using the above parameters over UART.
 WIFT - stop the server and disconnect from wi-fi, this is UART command only.  
 TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.  
 TRPO - deinit pin transparency, use TRAN command only.  
-*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.  
-WUBR - restart wifi-uart-bridge without restarting the target.PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pinHELP - display this help over UART.  
+*IDN? - request WUB identification number: (manufac),(model),(serno),HW(1.0),SW(1.0).  
+WUBR - restart wifi-uart-bridge without restarting the target.
+PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pinHELP - display this help over UART.  
 -------Reply--------  
 READy - WUB is ready for operation  
 DONE - the requested command has been executed. Some commands do not have a reply.  
