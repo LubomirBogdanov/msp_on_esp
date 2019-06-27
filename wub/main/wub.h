@@ -89,6 +89,10 @@ void uart_init(uart_config_t *uart_config);
 void uart_apply_config(void);
 void display_help(void);
 void display_help_uart(void);
+uint16_t get_idn_string(char *idn_str);
+void display_idn(void);
+void display_idn_uart(void);
+void display_ready(void);
 
 wub_cmd_e wifi_cmd_parse(uint32_t *param_numeric);
 void flush_wifi_cmd_buff(void);

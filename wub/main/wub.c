@@ -152,6 +152,42 @@ void display_help_uart(void){
 	uart_write_bytes(UART_NUM_0, (const char *)HELP_STR, strlen((const char *) HELP_STR));
 }
 
+uint16_t get_idn_string(char *idn_str){
+	uint32_t chip_id_int_lsb;
+	uint32_t chip_id_int_msb;
+	uint8_t chip_id[8];
+	memset(chip_id, 0x00, 8);
+	esp_wifi_get_mac(ESP_IF_WIFI_STA, chip_id);
+	chip_id_int_msb = (chip_id[5] << 8);
+	chip_id_int_msb |= chip_id[4];
+	chip_id_int_lsb = (chip_id[3] << 24);
+	chip_id_int_lsb |= (chip_id[2] << 16);
+	chip_id_int_lsb |= (chip_id[1] << 8);
+	chip_id_int_lsb |= chip_id[0];
+	sprintf(idn_str, "%s,%s,%08x%08x,HW%d.%d,SW%d.%d\n\r", IDN_MANUFACTURER_STR, IDN_MODEL_STR, chip_id_int_msb, chip_id_int_lsb,
+			WUB_HW_REVISION, WUB_HW_SUBREVISION, WUB_SW_REVISION, WUB_SW_SUBREVISION);
+
+	return strlen(idn_str);
+}
+
+void display_idn(void){
+	char idn_str[128];
+	uint16_t idn_str_size;
+	idn_str_size = get_idn_string(idn_str);
+	send(client_socket, (const char *)idn_str, idn_str_size, 0);
+}
+
+void display_idn_uart(void){
+	char idn_str[128];
+	uint16_t idn_str_size;
+	idn_str_size = get_idn_string(idn_str);
+	uart_write_bytes(UART_NUM_0, (const char *)idn_str, idn_str_size);
+}
+
+void display_ready(void){
+	uart_write_bytes(UART_NUM_0, (const char *)CMD_UART_READY_STR, strlen(CMD_UART_READY_STR));
+}
+
 void pin_init_as_inputs(void){
 	gpio_config_t io_conf;
 
@@ -441,6 +477,9 @@ wub_cmd_e wub_wifi_cmd_parse(uint32_t *param_numeric, char *param_string){
 		else if(!strcmp(cmd_buff, CMD_WIFI_START_STR)){
 			cmd_converted = CMD_START_WIFI;
 		}
+		else if(!strcmp(cmd_buff, CMD_WIFI_IDN_STR)){
+			cmd_converted = CMD_IDN;
+		}
 
 		flush_wifi_cmd_buff();
 	}
@@ -623,8 +662,17 @@ void wub_uart_cmd_exec_task(void *pvParameters){
 				pin_deinit_transparent();
 				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
 			}
+			else if(!strcmp(cmd_buff, CMD_UART_RESTART_WUB_STR)){
+				esp_restart();
+			}
+			else if(!strcmp(cmd_buff, CMD_UART_IDN_STR)){
+				display_idn_uart();
+			}
 			else if(!strcmp(cmd_buff, CMD_UART_HELP_STR)){
 				display_help_uart();
+			}
+			else if(!strcmp(cmd_buff, CMD_UART_POWER_OFF_WUB_STR)){
+				esp_deep_sleep(0);
 			}
 			else{
 				uart_write_bytes(UART_NUM_0, (const char *) CMD_UART_UNKNOWN_COMMAND_STR, strlen((const char *) CMD_UART_UNKNOWN_COMMAND_STR));
@@ -753,6 +801,9 @@ void wub_wifi_cmd_exec_task(void *pvParameters){
 			case CMD_HELLO:
 				send(client_socket, hello_msg, strlen(hello_msg), 0);
 				DEBUGOUT("CMD_HELLO\n\r");
+				break;
+			case CMD_IDN:
+				display_idn();
 				break;
 			case CMD_NONE:
 				//Do nothing

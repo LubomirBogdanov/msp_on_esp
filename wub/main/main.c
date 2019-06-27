@@ -49,6 +49,7 @@ void app_main(){
 	xTaskCreate(wub_wifi_server_task, "wub_wifi_server_task", 8192, NULL, WUB_WIFI_TASK_PRIORITY, &wub_server_task_h);
 
 	wifi_init_sta();
+	display_ready();
 }
 
 

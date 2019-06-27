@@ -10,6 +10,14 @@
 #ifndef WUB_COMMON_H_
 #define WUB_COMMON_H_
 
+#define WUB_SW_REVISION					1
+#define WUB_SW_SUBREVISION				0
+#define WUB_HW_REVISION					1
+#define WUB_HW_SUBREVISION				0
+
+#define IDN_MANUFACTURER_STR			"WUB"
+#define IDN_MODEL_STR					"ESP8266"
+
 //Parameters
 #define CMD_PARAM_ON_STR				"ON"
 #define CMD_PARAM_OFF_STR				"OFF"
@@ -21,14 +29,6 @@
 #define CMD_PARAM_ONE_STR				"ONE"
 #define CMD_PARAM_ONE_AND_HALF_STR		"ONE_AND_HALF"
 #define CMD_PARAM_TWO_STR				"TWO"
-//Replies
-#define CMD_EXEC_DONE_STR				"DONE\n\r" //Reply from server that the requested cmd has been executed
-#define CMD_NONE_STR					"NONE, try HELP\n\r"
-#define CMD_CONNECTED_STR				"CONN\n\r"
-#define CMD_WIFI_DISCONNECTED_STR		"DISC\n\r"
-#define CMD_WIFI_UNKNOWN_ERROR_STR		"WERR\n\r"
-#define CMD_UART_UNKNOWN_ERROR_STR		"UERR\n\r"
-#define CMD_UART_UNKNOWN_COMMAND_STR	"ERRU\n\r"
 //Wifi commands
 #define CMD_TRANSPARENT_STR				"TRAN" //TRAN {ON}
 #define CMD_SET_BSL_TYPE_STR			"BSLT" //BSLT {SHARED|DEDICATED}
@@ -48,6 +48,7 @@
 #define CMD_WIFI_SET_PASS_STR			"PASS" //PASS <string>
 #define CMD_WIFI_SET_PORT_STR			"PORT" //PORT <numeric value>
 #define CMD_WIFI_START_STR				"WIFS" //WIFS
+#define CMD_WIFI_IDN_STR				"*IDN?"//*IDN?
 //UART commands
 #define CMD_UART_SET_SSID_STR			"SSID" //SSID <ip value>
 #define CMD_UART_SET_PASS_STR			"PASS" //PASS <string>
@@ -57,8 +58,21 @@
 #define CMD_UART_HELP_STR				"HELP" //HELP
 #define CMD_UART_SET_TRAN_STR			"TRPI" //TRPI (transparent pin)
 #define CMD_UART_SET_TRAN_OFF_STR		"TRPO" //TRPO (transparent pin off)
+#define CMD_UART_IDN_STR				"*IDN?"//*IDN?
+#define CMD_UART_RESTART_WUB_STR		"WUBR" //WUBR
+#define CMD_UART_POWER_OFF_WUB_STR		"PWRO" //PWRO
+//Replies
+#define CMD_EXEC_DONE_STR				"DONE\n\r" //Reply from server that the requested cmd has been executed
+#define CMD_NONE_STR					"NONE, try HELP\n\r"
+#define CMD_CONNECTED_STR				"CONN\n\r"
+#define CMD_WIFI_DISCONNECTED_STR		"DISC\n\r"
+#define CMD_WIFI_UNKNOWN_ERROR_STR		"WERR\n\r"
+#define CMD_UART_UNKNOWN_ERROR_STR		"UERR\n\r"
+#define CMD_UART_UNKNOWN_COMMAND_STR	"ERRU\n\r"
+#define CMD_UART_READY_STR				"READy\n\r"
 
-#define HELP_STR	"TRAN {ON} - Set transparent mode ON.\n\r"														\
+#define HELP_STR	"-------Wi-Fi commands:--------\n\r"															\
+					"TRAN {ON} - Set transparent mode ON.\n\r"														\
 					"BSLT {SHARED|DEDICATED} - select BSL entry sequence type - shared or dedicated.\n\r"			\
 		    		"BOOT - initiate MSP430 boot sequence.\n\r"														\
 					"RSTT - reset target. SBWTDIO (RST) must be tied to Vdd with pull-up.\n\r"						\
@@ -76,6 +90,7 @@
 					"PASS <string> - change the network passord over the current network.\n\r"						\
 					"PORT <numeric value> - change the listen port over the current network.\n\r"					\
 					"WIFS - start a new server using the above parameters over the current network.\n\r"			\
+					"*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.\n\r"     \
 					"-------Uart commands:--------\n\r"																\
 					"SSID <string> - change the SSID name over UART.\n\r"											\
 					"PASS <string> - change the network passord over UART.\n\r"										\
@@ -84,8 +99,12 @@
 					"WIFT - stop the server and disconnect from wi-fi, this is UART command only.\n\r"				\
 					"TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.\n\r"	\
 					"TRPO - deinit pin transparency, use TRAN command only.\n\r"	                                \
+					"*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.\n\r"     \
+					"WUBR - restart wifi-uart-bridge without restarting the target."								\
+					"PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin"					\
 					"HELP - display this help over UART.\n\r"														\
 					"-------Reply--------\n\r"																		\
+					"READy - WUB is ready for operation\n\r"														\
 					"DONE - the requested command has been executed. Some commands do not have a reply.\n\r"		\
 					"NONE - the requested command does not exist or an error has occured.\n\r"						\
 					"CONN - the wub has connected successfully to the wi-fi network.\n\r"							\
@@ -119,6 +138,8 @@ typedef enum{
 	CMD_SET_SSID_PASS,
 	CMD_SET_SOCK_PORT,
 	CMD_START_WIFI,
+	CMD_IDN,
+	CMD_PWRO,
 	CMD_NONE
 }wub_cmd_e;
 
