@@ -120,21 +120,43 @@ tested it with DEDIC and it works also.
 
 Supported WUB SCPI commands  
 ===================================================================  
-TRAN {ON} - Set transparent mode on. The WUB will stop receiving SCPI commands until the TCP connection is closed. When this happens, WUB commands will be accessible again.  
+-------Wi-Fi commands:--------  
+TRAN {ON} - Set transparent mode ON.  
 BSLT {SHARED|DEDICATED} - select BSL entry sequence type - shared or dedicated.  
 BOOT - initiate MSP430 boot sequence.  
-RSTT - reset target. SBWTDIO (RST) must be tied to Vdd with pull-up because when the command finishes, both pins IO0 and IO2 will be configured as inputs. The WUB detaches itself this way. The UART pins continue to operate as UART, though.  
-HELP - display a list of commands over wi-fi.  
+RSTT - reset target. SBWTDIO (RST) must be tied to Vdd with pull-up.  
+SETT <numeric value> - set timeout for the transparent mode. (not implemented yet)  
+HELP - display this help over wifi.  
 HALT - hold the target in reset.  
-SETB <numeric value> - set UART baudrate, see ESP8266 datasheet for valid values.  
-SETW <numeric value> - set UART word length, valid values are 5, 6, 7 and 8.  
-SETP {ODD|EVEN|NONE} - set UART parity, valid values are the strings ODD, EVEN or NONE.	  
-SETS {ONE|ONE_AND_HALF|TWO} - set UART stop bit.  
-UARA - apply UART configuration with the new settings.  
+SETB <numeric value> - set uart baudrate, see ESP8266 datasheet for valid values.  
+SETW <numeric value> - set uart word length, valid values are 5, 6, 7 and 8.  
+SETP {ODD|EVEN|NONE} - set uart parity, valid values are the strings ODD, EVEN or NONE.  
+SETS {ONE|ONE_AND_HALF|TWO} - set uart stop bit.  
+UARA - UART apply config with the new settings.  
 WUBR - restart wifi-uart-bridge without restarting the target.  
-HELLo - display a warm greeting over TCP/IP to test connection.	 
-SSID <string> - change the SSID name over the current network, this command is dangerous!  
-PASS <string> - change the network password over the current network, this command is dangerous!  
+HELLo - display a warm greeting over TCP/IP to test connection.  
+SSID <string> - change the SSID name over the current network.  
+PASS <string> - change the network passord over the current network.  
 PORT <numeric value> - change the listen port over the current network.  
 WIFS - start a new server using the above parameters over the current network.  
+*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.  
+-------Uart commands:--------  
+SSID <string> - change the SSID name over UART.  
+PASS <string> - change the network passord over UART.  
+PORT <numeric value> - change the listen port over UART.  
+WIFS - start a new server using the above parameters over UART.  
+WIFT - stop the server and disconnect from wi-fi, this is UART command only.  
+TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.  
+TRPO - deinit pin transparency, use TRAN command only.  
+*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.  
+WUBR - restart wifi-uart-bridge without restarting the target.PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pinHELP - display this help over UART.  
+-------Reply--------  
+READy - WUB is ready for operation  
+DONE - the requested command has been executed. Some commands do not have a reply.  
+NONE - the requested command does not exist or an error has occured.  
+CONN - the wub has connected successfully to the wi-fi network.  
+DISC - the wub has been disconnected from the wi-fi network.  
+WERR - An unknown error has occured with the wi-fi adapter.  
+UERR - An unknown error has occured on the UART interface.  
+ERRU - An unknown command has been requested on the UART interface.  
 

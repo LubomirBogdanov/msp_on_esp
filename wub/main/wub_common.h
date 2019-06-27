@@ -100,8 +100,8 @@
 					"TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.\n\r"	\
 					"TRPO - deinit pin transparency, use TRAN command only.\n\r"	                                \
 					"*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.\n\r"     \
-					"WUBR - restart wifi-uart-bridge without restarting the target."								\
-					"PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin"					\
+					"WUBR - restart wifi-uart-bridge without restarting the target.\n\r"								\
+					"PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin\n\r"					\
 					"HELP - display this help over UART.\n\r"														\
 					"-------Reply--------\n\r"																		\
 					"READy - WUB is ready for operation\n\r"														\
