@@ -125,34 +125,29 @@ TRAN {ON} - Set transparent mode ON.
 BSLT {SHARED|DEDICATED} - select BSL entry sequence type - shared or dedicated.  
 BOOT - initiate MSP430 boot sequence.  
 RSTT - reset target. SBWTDIO (RST) must be tied to Vdd with pull-up.  
-SETT (numeric value) - set timeout for the transparent mode. (not implemented yet)  
-HELP - display this help over wifi.  
+SETT <numeric value> - set timeout for the transparent mode. (not implemented yet)  
 HALT - hold the target in reset.  
-SETB (numeric value) - set uart baudrate, see ESP8266 datasheet for valid values.  
-SETW (numeric value) - set uart word length, valid values are 5, 6, 7 and 8.  
+HELLo - display a warm greeting over TCP/IP to test connection.  
+-------Uart commands:--------  
+WIFT - stop the server and disconnect from wi-fi, this is UART command only.  
+TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.  
+TRPO - deinit pin transparency, use TRAN command only.  
+PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin  
+-------Common commands:--------  
+*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.  
+HELP - display this help over wifi.  
+WUBR - restart wifi-uart-bridge without restarting the target.  
+SSID <string> - change the SSID name over the current network.  
+PASS <string> - change the network passord over the current network.  
+PORT <numeric value> - change the listen port over the current network.  
+WIFS - start a new server using the above parameters over the current network.  
+SETB <numeric value> - set uart baudrate, see ESP8266 datasheet for valid values.  
+SETW <numeric value> - set uart word length, valid values are 5, 6, 7 and 8.  
 SETP {ODD|EVEN|NONE} - set uart parity, valid values are the strings ODD, EVEN or NONE.  
 SETS {ONE|ONE_AND_HALF|TWO} - set uart stop bit.  
 UARA - UART apply config with the new settings.  
-WUBR - restart wifi-uart-bridge without restarting the target.  
-HELLo - display a warm greeting over TCP/IP to test connection.  
-SSID (string) - change the SSID name over the current network.  
-PASS (string) - change the network passord over the current network.  
-PORT (numeric value) - change the listen port over the current network.  
-WIFS - start a new server using the above parameters over the current network.  
-*IDN? - request WUB identification number: (manufac),(model),(serno),HW(1.0),SW(1.0).  
--------Uart commands:--------  
-SSID (string) - change the SSID name over UART.  
-PASS (string) - change the network passord over UART.  
-PORT (numeric value) - change the listen port over UART.  
-WIFS - start a new server using the above parameters over UART.  
-WIFT - stop the server and disconnect from wi-fi, this is UART command only.  
-TRPI (numeric value) - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.  
-TRPO - deinit pin transparency, use TRAN command only.  
-*IDN? - request WUB identification number: (manufac),(model),(serno),HW(1.0),SW(1.0).  
-WUBR - restart wifi-uart-bridge without restarting the target.
-PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pinHELP - display this help over UART.  
 -------Reply--------  
-READy - WUB is ready for operation  
+READy - WUB is ready for operation.  
 DONE - the requested command has been executed. Some commands do not have a reply.  
 NONE - the requested command does not exist or an error has occured.  
 CONN - the wub has connected successfully to the wi-fi network.  

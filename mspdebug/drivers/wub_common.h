@@ -11,7 +11,7 @@
 #define WUB_COMMON_H_
 
 #define WUB_SW_REVISION					1
-#define WUB_SW_SUBREVISION				1
+#define WUB_SW_SUBREVISION				2
 #define WUB_HW_REVISION					1
 #define WUB_HW_SUBREVISION				0
 
@@ -79,32 +79,26 @@
 		    		"BOOT - initiate MSP430 boot sequence.\n\r"														\
 					"RSTT - reset target. SBWTDIO (RST) must be tied to Vdd with pull-up.\n\r"						\
 		    		"SETT <numeric value> - set timeout for the transparent mode. (not implemented yet)\n\r"	    \
-		    		"HELP - display this help over wifi.\n\r"														\
 					"HALT - hold the target in reset.\n\r"															\
+					"HELLo - display a warm greeting over TCP/IP to test connection.\n\r"							\
+					"-------Uart commands:--------\n\r"																\
+					"WIFT - stop the server and disconnect from wi-fi, this is UART command only.\n\r"				\
+					"TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.\n\r"	\
+					"TRPO - deinit pin transparency, use TRAN command only.\n\r"	                                \
+					"PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin\n\r"				\
+					"-------Common commands:--------\n\r"															\
+					"*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.\n\r"     \
+					"HELP - display this help over wifi.\n\r"														\
+					"WUBR - restart wifi-uart-bridge without restarting the target.\n\r"  							\
+					"SSID <string> - change the SSID name over the current network.\n\r"							\
+					"PASS <string> - change the network passord over the current network.\n\r"						\
+					"PORT <numeric value> - change the listen port over the current network.\n\r"					\
+					"WIFS - start a new server using the above parameters over the current network.\n\r"			\
 					"SETB <numeric value> - set uart baudrate, see ESP8266 datasheet for valid values.\n\r"			\
 					"SETW <numeric value> - set uart word length, valid values are 5, 6, 7 and 8.\n\r"				\
 					"SETP {ODD|EVEN|NONE} - set uart parity, valid values are the strings ODD, EVEN or NONE.\n\r"	\
 					"SETS {ONE|ONE_AND_HALF|TWO} - set uart stop bit.\n\r"											\
 					"UARA - UART apply config with the new settings.\n\r"											\
-					"WUBR - restart wifi-uart-bridge without restarting the target.\n\r"  							\
-					"HELLo - display a warm greeting over TCP/IP to test connection.\n\r"							\
-					"SSID <string> - change the SSID name over the current network.\n\r"							\
-					"PASS <string> - change the network passord over the current network.\n\r"						\
-					"PORT <numeric value> - change the listen port over the current network.\n\r"					\
-					"WIFS - start a new server using the above parameters over the current network.\n\r"			\
-					"*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.\n\r"     \
-					"-------Uart commands:--------\n\r"																\
-					"SSID <string> - change the SSID name over UART.\n\r"											\
-					"PASS <string> - change the network passord over UART.\n\r"										\
-					"PORT <numeric value> - change the listen port over UART.\n\r"									\
-					"WIFS - start a new server using the above parameters over UART.\n\r"							\
-					"WIFT - stop the server and disconnect from wi-fi, this is UART command only.\n\r"				\
-					"TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.\n\r"	\
-					"TRPO - deinit pin transparency, use TRAN command only.\n\r"	                                \
-					"*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.\n\r"     \
-					"WUBR - restart wifi-uart-bridge without restarting the target.\n\r"							\
-					"PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin\n\r"				\
-					"HELP - display this help over UART.\n\r"														\
 					"-------Reply--------\n\r"																		\
 					"READy - WUB is ready for operation.\n\r"														\
 					"DONE - the requested command has been executed. Some commands do not have a reply.\n\r"		\

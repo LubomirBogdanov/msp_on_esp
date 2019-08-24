@@ -305,6 +305,7 @@ void enter_boot(void){
 void uart_init(uart_config_t *uart_config){
 	uart_param_config(UART_NUM_0, uart_config);
 	uart_driver_install(UART_NUM_0, WUB_UART_RX_BUFF_SIZE, 0, 32, &uart0_queue);
+	uart_conf = *uart_config;
 }
 
 void uart_apply_config(void){
@@ -593,6 +594,9 @@ void wub_uart_cmd_exec_task(void *pvParameters){
 	char param_buff[WUB_PARAM_MAX_LEN];
 	char string_buff[WUB_CMD_MAX_LEN+WUB_PARAM_MAX_LEN+4];
 	char *ptr;
+	uint8_t uart_data_bits = 0;
+	uint8_t uart_parity = 0;
+	uint8_t uart_stop_bits = 0;
 
 	DEBUGOUT("wub_uart_cmd_task\n\r");
 
@@ -673,6 +677,63 @@ void wub_uart_cmd_exec_task(void *pvParameters){
 			}
 			else if(!strcmp(cmd_buff, CMD_UART_POWER_OFF_WUB_STR)){
 				esp_deep_sleep(0);
+			}
+
+			else if(!strcmp(cmd_buff, CMD_SET_UART_BAUDRATE_STR)){
+				uart_conf.baud_rate = atoi(param_buff);
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_SET_UART_WORD_STR)){
+				uart_data_bits = atoi(param_buff);
+
+				switch(uart_data_bits){
+				case 5:
+					uart_data_bits = UART_DATA_5_BITS;
+					break;
+				case 6:
+					uart_data_bits = UART_DATA_6_BITS;
+					break;
+				case 7:
+					uart_data_bits = UART_DATA_7_BITS;
+					break;
+				case 8:
+					uart_data_bits = UART_DATA_8_BITS;
+					break;
+				}
+
+				uart_conf.data_bits = (uart_word_length_t) uart_data_bits;
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_SET_UART_PARITY_STR)){
+				if(!strcmp(param_buff, CMD_PARAM_ODD_STR)){
+					uart_parity = UART_PARITY_ODD;
+				}
+				else if(!strcmp(param_buff, CMD_PARAM_EVEN_STR)){
+					uart_parity = UART_PARITY_EVEN;
+				}
+				else if(!strcmp(param_buff, CMD_PARAM_DISABLED_STR)){
+					uart_parity = UART_PARITY_DISABLE;
+				}
+
+				uart_conf.parity = (uart_parity_t) uart_parity;
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_SET_UART_STOP_STR)){
+				if(!strcmp(param_buff, CMD_PARAM_ONE_STR)){
+					uart_stop_bits = UART_STOP_BITS_1;
+				}
+				else if(!strcmp(param_buff, CMD_PARAM_ONE_AND_HALF_STR)){
+					uart_stop_bits = UART_STOP_BITS_1_5;
+				}
+				else if(!strcmp(param_buff, CMD_PARAM_TWO_STR)){
+					uart_stop_bits = UART_STOP_BITS_2;
+				}
+
+				uart_conf.stop_bits = (uart_stop_bits_t) uart_stop_bits;
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_EXEC_DONE_STR, strlen((const char *) CMD_EXEC_DONE_STR));
+			}
+			else if(!strcmp(cmd_buff, CMD_UART_APPLY_CONFIG_STR)){
+				uart_apply_config();
 			}
 			else{
 				uart_write_bytes(UART_NUM_0, (const char *) CMD_UART_UNKNOWN_COMMAND_STR, strlen((const char *) CMD_UART_UNKNOWN_COMMAND_STR));
