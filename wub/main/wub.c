@@ -858,6 +858,8 @@ void wub_wifi_server_task(void *pvParameters){
 			}
 			DEBUGOUT("Connection accepted!\n\r");
 
+			uart_write_bytes(UART_NUM_0, (const char *) CMD_UART_CLIENT_CONNECTED, strlen((const char *) CMD_UART_CLIENT_CONNECTED));
+
 			while(1){
 				wub_conf.wifi_rx_buffer_len = recv(client_socket, wub_conf.wifi_rx_buffer, WUB_WIFI_RX_BUFF_SIZE-1, 0);
 
@@ -889,6 +891,7 @@ void wub_wifi_server_task(void *pvParameters){
 				close(client_socket);
 				client_socket = 0;
 				wub_conf.transparent_mode = 0;
+				uart_write_bytes(UART_NUM_0, (const char *) CMD_UART_CLIENT_DISCONNECTED, strlen((const char *) CMD_UART_CLIENT_DISCONNECTED));
 			}
 		}
 

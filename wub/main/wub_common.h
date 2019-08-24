@@ -11,7 +11,7 @@
 #define WUB_COMMON_H_
 
 #define WUB_SW_REVISION					1
-#define WUB_SW_SUBREVISION				0
+#define WUB_SW_SUBREVISION				1
 #define WUB_HW_REVISION					1
 #define WUB_HW_SUBREVISION				0
 
@@ -70,6 +70,8 @@
 #define CMD_UART_UNKNOWN_ERROR_STR		"UERR\n\r"
 #define CMD_UART_UNKNOWN_COMMAND_STR	"ERRU\n\r"
 #define CMD_UART_READY_STR				"READy\n\r"
+#define CMD_UART_CLIENT_CONNECTED		"CLIC\n\r"
+#define CMD_UART_CLIENT_DISCONNECTED	"CLID\n\r"
 
 #define HELP_STR	"-------Wi-Fi commands:--------\n\r"															\
 					"TRAN {ON} - Set transparent mode ON.\n\r"														\
@@ -100,11 +102,11 @@
 					"TRPI <numeric value> - init pin (0 - 16) as input that will toggle the TRAN ON/OFF state.\n\r"	\
 					"TRPO - deinit pin transparency, use TRAN command only.\n\r"	                                \
 					"*IDN? - request WUB identification number: <manufac>,<model>,<serno>,HW<1.0>,SW<1.0>.\n\r"     \
-					"WUBR - restart wifi-uart-bridge without restarting the target.\n\r"								\
-					"PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin\n\r"					\
+					"WUBR - restart wifi-uart-bridge without restarting the target.\n\r"							\
+					"PWRO - turn wifi-uart-bridge power off, wake-up only through its reset pin\n\r"				\
 					"HELP - display this help over UART.\n\r"														\
 					"-------Reply--------\n\r"																		\
-					"READy - WUB is ready for operation\n\r"														\
+					"READy - WUB is ready for operation.\n\r"														\
 					"DONE - the requested command has been executed. Some commands do not have a reply.\n\r"		\
 					"NONE - the requested command does not exist or an error has occured.\n\r"						\
 					"CONN - the wub has connected successfully to the wi-fi network.\n\r"							\
@@ -112,6 +114,8 @@
 					"WERR - An unknown error has occured with the wi-fi adapter.\n\r"								\
 					"UERR - An unknown error has occured on the UART interface.\n\r"								\
 					"ERRU - An unknown command has been requested on the UART interface.\n\r"						\
+					"CLIC - A client has connected to the WUB server.\n\r"											\
+					"CLID - A client has disconnected from the WUB server. Transparency is also turned off.\n\r"	\
 
 typedef enum{
 	BSL_UART_SHARED_JTAG_SBW,
