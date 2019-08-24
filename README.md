@@ -160,4 +160,6 @@ DISC - the wub has been disconnected from the wi-fi network.
 WERR - An unknown error has occured with the wi-fi adapter.  
 UERR - An unknown error has occured on the UART interface.  
 ERRU - An unknown command has been requested on the UART interface.  
+CLIC - A client has connected to the WUB server.  
+CLID - A client has disconnected from the WUB server. Transparency is also turned off.  
 
